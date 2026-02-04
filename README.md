@@ -20,6 +20,7 @@ store used by the project.
 - Python 3.12
 - MongoDB running locally see documentation: [mongodb](https://www.mongodb.com/docs/v8.0/tutorial/install-mongodb-on-ubuntu/#std-label-install-mdb-community-ubuntu)
 - `uv` for package manager
+- `ZenML` for pipeline management
 
 **Installation**
 
@@ -31,9 +32,13 @@ cd chatnews
 ```
 2. Install UV
 
-UV is the package manager for the repository. You can install UV with:
-```
+```sh
 curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+3. Run ZenML
+```sh
+uv run zenml login --local
 ```
 
 ## Configuration
