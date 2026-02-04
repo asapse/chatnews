@@ -5,9 +5,17 @@ description = "News aggregator"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "feedparser>=6.0.12",
+    "justext>=3.0.2",
+    "lingua-language-detector>=2.1.1",
+    "loguru>=0.7.3",
+    "pydantic>=2.11.9",
     "pymongo>=4.16.0",
+    "requests>=2.32.5",
     "rss-parser>=2.1.1",
-    "zenml[local]>=0.93.1",
+    "tqdm>=4.67.1",
+    "typing-extensions>=4.15.0",
+    "zenml[local,server]>=0.93.1",
 ]
 
 
@@ -27,7 +35,7 @@ target-version = "py312"
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
-known-first-party = ["main", "app", "pipelines"]
+known-first-party = ["main", "app", "pipelines", "core"]
 
 [tool.ruff.lint]
 select = ["E", "F", "SIM", "B", "UP", "I", "S", "W", "C90"]

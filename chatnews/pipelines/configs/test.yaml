@@ -1,0 +1,4 @@
+parameters:
+  user_full_name: Bob Alice
+  links:
+    - https://maximelabonne.substack.com/feed
