@@ -1,3 +1,4 @@
+import os
 from typing import Annotated
 from urllib.parse import urlparse
 
@@ -11,7 +12,13 @@ from chatnews.core.entities.models.user import User
 from chatnews.pipelines.utils.fetch import Fetch
 
 
-DATABASE: MongoDB[Document] = MongoDB[Document]("chatnews", "articles", Document)
+DATABASE_NAME: str = os.getenv("MONGODB_DATABASE")
+COLLECTION_NAME: str = os.getenv("MONGODB_ARTICLES_COLLECTION")
+
+
+DATABASE: MongoDB[Document] = MongoDB[Document](
+    DATABASE_NAME, COLLECTION_NAME, Document
+)
 
 
 @step

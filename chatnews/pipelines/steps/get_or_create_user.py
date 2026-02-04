@@ -1,3 +1,4 @@
+import os
 from typing import Annotated
 
 from loguru import logger
@@ -7,7 +8,10 @@ from chatnews.core.adapters.databases.mongodb import MongoDB
 from chatnews.core.entities.models.user import User
 
 
-DATABASE: MongoDB[User] = MongoDB[User]("chatnews", "users", User)
+DATABASE_NAME: str = os.getenv("MONGODB_DATABASE", "chatnews")
+COLLECTION_NAME: str = os.getenv("MONGODB_USERS_COLLECTION", "users")
+
+DATABASE: MongoDB[User] = MongoDB[User](DATABASE_NAME, COLLECTION_NAME, User)
 
 
 @step

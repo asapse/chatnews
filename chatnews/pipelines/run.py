@@ -3,7 +3,7 @@ import os
 import click
 from loguru import logger
 
-from chatnews.pipelines.pipelines.extract_from_rss import digital_data_etl
+from chatnews.pipelines.pipelines.extract_from_rss import extract_user_feeds
 
 
 @click.command(
@@ -57,7 +57,7 @@ def main(
         pipeline_args["enable_cache"] = False
     pipeline_args["config_path"] = os.path.join(config_folder, user_rss_config)
     run_args_feature = {}
-    digital_data_etl.with_options(**pipeline_args)(**run_args_feature)
+    extract_user_feeds.with_options(**pipeline_args)(**run_args_feature)
     logger.info("Feature Engineering pipeline finished successfully!\n")
 
 

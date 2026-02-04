@@ -47,6 +47,7 @@ uv run zenml login --local
 - Add a YAML config (example below) and pass it to the runner with
   `--user-rss-config`.
 - Ensure MongoDB is available
+- Create `.env` file like `.env.example`
 
 Example config (`chatnews/pipelines/configs/test.yaml`):
 
@@ -62,7 +63,7 @@ parameters:
 Run the pipeline module directly:
 
 ```bash
-uv run -m chatnews.pipelines.run --user-rss-config test.yaml
+uv run --env-file .env -m chatnews.pipelines.run --user-rss-config test.yaml
 ```
 
 Available options used by the runner include `--user-rss-config <file>` and
