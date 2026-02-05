@@ -12,6 +12,7 @@ description = "News aggregator"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "fake-useragent>=2.2.0",
     "feedparser>=6.0.12",
     "justext>=3.0.2",
     "lingua-language-detector>=2.1.1",
@@ -22,7 +23,7 @@ dependencies = [
     "rss-parser>=2.1.1",
     "tqdm>=4.67.1",
     "typing-extensions>=4.15.0",
-    "zenml[local,server]>=0.93.1",
+    "zenml[server]>=0.93.2",
 ]
 
 
@@ -32,6 +33,7 @@ dev = [
     "pre-commit>=4.3.0",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
+    "pytest-env>=1.2.0",
     "ruff>=0.12.8",
     "ty>=0.0.14",
 ]
@@ -44,7 +46,7 @@ target-version = "py312"
 
 [tool.ruff.lint.isort]
 lines-after-imports = 2
-known-first-party = ["main", "app", "pipelines", "core"]
+known-first-party = ["main", "chatnews"]
 
 [tool.ruff.lint]
 select = ["E", "F", "SIM", "B", "UP", "I", "S", "W", "C90"]
@@ -55,13 +57,32 @@ quote-style = "double"
 indent-style = "space"
 line-ending = "auto"
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101"]
 
 [tool.pytest]
 minversion = "9.0"
 addopts = [
     "-v", 
     "--showlocals", 
-    "--cov=chatnews/",
+    "--cov=chatnews",
     "--cov-report=term-missing",
     "--junitxml=./test-reports/report.xml"
+]
+
+[tool.pytest_env]
+MONGODB_DATABASE="test_chatnews"
+MONGODB_USERS_COLLECTION="test_users_test"
+MONGODB_ARTICLES_COLLECTION="test_articles_test"
+
+[tool.coverage.run]
+omit = [
+    "__init__.py",
+    "chatnews/pipelines/run.py"
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "@step",
+    "@pipeline"
 ]

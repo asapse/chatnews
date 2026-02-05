@@ -2,6 +2,7 @@ import re
 
 import feedparser
 import requests
+from fake_useragent import UserAgent
 from justext import get_stoplist, justext
 
 from chatnews.core.entities.models.document import Content, Document
@@ -13,21 +14,23 @@ class Fetch:
         self._url: str = url
         self._lang_detector: LangDetector = LangDetector()
         self._paywall_pattern: re.Pattern[bytes] = re.compile(
-            b'"isAccessibleForFree": "(False|True)"'
+            b'"isAccessibleForFree": ?"(False|True)"'
         )
         self._user_id: str = user_id
+        self._default_language: str = "English"
 
-    def _find_lang(self, text: str) -> str:
+    def _find_lang(self, text: str) -> str | None:
         return self._lang_detector.detect(text)
 
     def _get_content_page(self, url: str) -> bytes:
-        response = requests.get(url, timeout=10)
+        headers = {"User-Agent": UserAgent().firefox}
+        response = requests.get(url, headers=headers, timeout=10)
         return response.content
 
     def _is_paywall(self, content: bytes) -> bool:
         is_paywall: bool = False
-        paywall_matchs = self._paywall_pattern.match(content) or []
-        if b"True" in paywall_matchs:
+        paywall_matchs = self._paywall_pattern.findall(content)
+        if b"False" in paywall_matchs:
             is_paywall = True
 
         return is_paywall
@@ -35,21 +38,26 @@ class Fetch:
     def _get_body(self, content: bytes, language: str) -> str:
         paragraphs = justext(content, get_stoplist(language))
         body: str = ""
+        body_full_page: str = ""
         for paragraph in paragraphs:
-            if not paragraph.is_boilerplate and "article" in paragraph.dom_path:
-                body += paragraph.text
-        return body
+            if not paragraph.is_boilerplate:
+                if "article" in paragraph.dom_path:
+                    body += paragraph.text
+                body_full_page += paragraph.text
+        return body or body_full_page
 
     def _parse_document(self, document: dict, rss_feed: str) -> Document:
         content_page = self._get_content_page(document["link"])
-        lang: str = self._find_lang(document["summary"] or document["title"])
+        lang: str = (
+            self._find_lang(document["summary"] or document["title"])
+            or self._default_language
+        )
         paywall: bool = self._is_paywall(content_page)
-        body: str = self._get_body(content_page, language=lang)
 
-        if not body:
-            body = self._get_body(content_page, language="English")
-            if body:
-                lang = "English"
+        body: str = self._get_body(content_page, language=lang)
+        if not body and lang != self._default_language:
+            body = self._get_body(content_page, language=self._default_language)
+            lang = self._default_language
 
         content = Content(
             title=document["title"], subtitle=document["summary"] or "", body=body
@@ -66,7 +74,7 @@ class Fetch:
         )
         return document_format
 
-    def _fetch_url(self, url) -> list[Document]:
+    def _fetch_url(self, url: str) -> list[Document]:
         documents = feedparser.parse(url)
         documents_format: list[Document] = []
         for document in documents["entries"]:

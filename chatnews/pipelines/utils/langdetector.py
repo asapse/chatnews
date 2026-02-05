@@ -1,19 +1,35 @@
 from lingua import Language, LanguageDetector, LanguageDetectorBuilder
 
 
-class LangDetector:
-    def __init__(self, languages: list[str] | None = None) -> None:
-        if not languages:
-            languages: list[str | Language] = [
-                Language.ENGLISH,
-                Language.FRENCH,
-                Language.GERMAN,
-                Language.SPANISH,
-            ]
-        self._detector: LanguageDetector = LanguageDetectorBuilder.from_languages(
-            *languages
-        ).build()
+LANG_MAPPING = {
+    "English": Language.ENGLISH,
+    "French": Language.FRENCH,
+    "German": Language.GERMAN,
+    "Spanish": Language.SPANISH,
+}
 
-    def detect(self, text) -> str:
-        lang: str = self._detector.detect_language_of(text).name.capitalize()
+
+class LangDetector:
+    def __init__(
+        self, languages: list[str] | None = None, threshold: float = 0.80
+    ) -> None:
+        self._languages: list[str | Language] = []
+        if languages:
+            self._languages = [
+                LANG_MAPPING[lang] for lang in languages if lang in LANG_MAPPING
+            ]
+        if not languages and not self._languages:
+            self._languages: list[str | Language] = list(LANG_MAPPING.values())
+
+        self._detector: LanguageDetector = (
+            LanguageDetectorBuilder.from_languages(*self._languages)
+            .with_minimum_relative_distance(threshold)
+            .build()
+        )
+
+    def detect(self, text) -> str | None:
+        try:
+            lang: str = self._detector.detect_language_of(text).name.capitalize()
+        except AttributeError:
+            return None
         return lang
