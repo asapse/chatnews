@@ -24,8 +24,7 @@ class MongoDB(BaseCRUD[T]):
             response = self._collection.insert_one(data.model_dump(by_alias=True))
         except errors.WriteError as err:
             raise err
-        _id = str(response.inserted_id)
-        return _id
+        return str(response.inserted_id)
 
     def get(self, id: str | None = None, **kwargs) -> T | None:
         filter = {"_id": id} if id else kwargs
@@ -43,3 +42,10 @@ class MongoDB(BaseCRUD[T]):
         except errors.PyMongoError as err:
             raise err
         return self._to_model(result)
+
+    def delete(self, id: str) -> bool:
+        try:
+            result = self._collection.delete_one({"_id": id})
+        except errors.PyMongoError as err:
+            raise err
+        return result.deleted_count == 1

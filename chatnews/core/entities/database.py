@@ -18,6 +18,10 @@ class BaseCRUD[T: BaseModel](ABC):
     def update(self, id: str, data: T) -> T | None:
         pass
 
+    @abstractmethod
+    def delete(self, id: str) -> bool:
+        pass
+
     def _to_model(self, data: dict) -> T | None:
         if data is None:
             return None
