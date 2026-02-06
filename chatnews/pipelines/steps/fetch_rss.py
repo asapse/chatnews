@@ -1,4 +1,3 @@
-import os
 from copy import deepcopy
 from typing import Annotated
 from urllib.parse import urlparse
@@ -10,11 +9,12 @@ from zenml import get_step_context, step
 from chatnews.core.adapters.databases.mongodb import MongoDB
 from chatnews.core.entities.models.document import Document
 from chatnews.core.entities.models.user import User
+from chatnews.pipelines.configs.settings import PIPELINE_SETTINGS
 from chatnews.pipelines.utils.fetch import Fetch
 
 
-DATABASE_NAME: str = os.getenv("MONGODB_DATABASE")
-COLLECTION_NAME: str = os.getenv("MONGODB_ARTICLES_COLLECTION")
+DATABASE_NAME: str = PIPELINE_SETTINGS.mongodb_database
+COLLECTION_NAME: str = PIPELINE_SETTINGS.mongodb_articles_collection
 
 
 DATABASE: MongoDB[Document] = MongoDB[Document](

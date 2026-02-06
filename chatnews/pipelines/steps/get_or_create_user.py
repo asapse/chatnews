@@ -1,4 +1,3 @@
-import os
 from typing import Annotated
 
 from loguru import logger
@@ -6,10 +5,11 @@ from zenml import get_step_context, step
 
 from chatnews.core.adapters.databases.mongodb import MongoDB
 from chatnews.core.entities.models.user import User
+from chatnews.pipelines.configs.settings import PIPELINE_SETTINGS
 
 
-DATABASE_NAME: str = os.getenv("MONGODB_DATABASE", "chatnews")
-COLLECTION_NAME: str = os.getenv("MONGODB_USERS_COLLECTION", "users")
+DATABASE_NAME: str = PIPELINE_SETTINGS.mongodb_database
+COLLECTION_NAME: str = PIPELINE_SETTINGS.mongodb_users_collection
 
 DATABASE: MongoDB[User] = MongoDB[User](DATABASE_NAME, COLLECTION_NAME, User)
 
