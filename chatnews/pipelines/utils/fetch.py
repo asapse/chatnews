@@ -28,12 +28,7 @@ class Fetch:
         return response.content
 
     def _is_paywall(self, content: bytes) -> bool:
-        is_paywall: bool = False
-        paywall_matchs = self._paywall_pattern.findall(content)
-        if b"False" in paywall_matchs:
-            is_paywall = True
-
-        return is_paywall
+        return b"False" in self._paywall_pattern.findall(content)
 
     def _get_body(self, content: bytes, language: str) -> str:
         paragraphs = justext(content, get_stoplist(language))

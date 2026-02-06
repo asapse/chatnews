@@ -26,7 +26,7 @@ def get_or_create_user(user_full_name: str) -> Annotated[User, "user"]:
 
 
 def _get_or_create_user(user_full_name: str) -> Annotated[User, "user"]:
-    logger.info(f"Getting or creating user: {user_full_name}")
+    logger.info("Getting or creating user: %s", user_full_name)
 
     first_name, last_name = user_full_name.split(" ")
 

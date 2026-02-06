@@ -24,8 +24,7 @@ DATABASE: MongoDB[Document] = MongoDB[Document](
 
 @step
 def fetch_links(user: User, links: list[str]) -> Annotated[list[str], "fetch_links"]:
-    logger.info(f"Starting to crawl {len(links)} link(s).")
-
+    logger.info("Starting to crawl %d link(s).", {len(links)})
     metadata = {}
     successfull_crawls = 0
     for link in tqdm(links):
@@ -44,7 +43,7 @@ def fetch_links(user: User, links: list[str]) -> Annotated[list[str], "fetch_lin
     step_context = get_step_context()
     step_context.add_output_metadata(output_name="fetch_links", metadata=metadata)
 
-    logger.info(f"Successfully crawled {successfull_crawls} / {len(links)} links.")
+    logger.info("Successfully crawled %d / %d links.", successfull_crawls, len(links))
 
     return links
 
@@ -59,7 +58,7 @@ def _crawl_link(user_id: str, link: str) -> tuple[bool, str, int, int]:
         insert, not_insert = _save_documents(documents)
         return (True, domain, insert, not_insert)
     except Exception as e:
-        logger.error(f"An error occurred while crowling: {e!s}")
+        logger.error("An error occurred while crowling: %s", str(e))
 
         return (False, domain, insert, not_insert)
 

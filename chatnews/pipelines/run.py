@@ -51,7 +51,7 @@ def main(
         os.path.dirname(os.path.realpath(__file__)),
         "configs",
     )
-    logger.info(f"Info run pipeline for file {user_rss_config}")
+    logger.info("Info run pipeline for file %s", user_rss_config)
     pipeline_args = {}
     if no_cache:
         pipeline_args["enable_cache"] = False
