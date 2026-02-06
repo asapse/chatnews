@@ -18,9 +18,10 @@ store used by the project.
 ## Requirements
 
 - Python 3.12
-- MongoDB running locally see documentation: [mongodb](https://www.mongodb.com/docs/v8.0/tutorial/install-mongodb-on-ubuntu/#std-label-install-mdb-community-ubuntu)
+- `MongoDB` running on container
 - `uv` for package manager
 - `ZenML` for pipeline management
+- `Podman` (or Docker)
 
 **Installation**
 
@@ -39,6 +40,19 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 3. Run ZenML
 ```sh
 uv run zenml login --local
+```
+
+3. (Optional) Install Podman
+Instruction : (https://podman.io/docs/installation)[https://podman.io/docs/installation]
+
+4. Pull images from docker-compose
+```sh
+uv run podman-compose pull
+```
+
+5. Start your container
+```sh
+uv run podman-compose up -d
 ```
 
 ## Configuration
