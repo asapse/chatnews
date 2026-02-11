@@ -4,6 +4,7 @@ from uuid import uuid4
 
 from pydantic import (
     UUID4,
+    AliasChoices,
     BaseModel,
     Field,
     SerializerFunctionWrapHandler,
@@ -12,7 +13,9 @@ from pydantic import (
 
 
 class NoSQLDocument(BaseModel):
-    id: UUID4 = Field(default_factory=uuid4, alias="_id")
+    id: UUID4 = Field(
+        default_factory=uuid4, alias="_id", validation_alias=AliasChoices("id", "_id")
+    )
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
