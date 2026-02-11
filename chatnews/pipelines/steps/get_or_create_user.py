@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Annotated
 
 from loguru import logger
@@ -19,10 +20,24 @@ def get_or_create_user(user_full_name: str) -> Annotated[User, "user"]:
     user = _get_or_create_user(user_full_name)
     step_context = get_step_context()
     step_context.add_output_metadata(
-        output_name="user", metadata=_get_metadata(user_full_name, user)
+        output_name="user", metadata=_get_metadata({}, user_full_name, user)
     )
 
     return user
+
+
+@step
+def get_or_create_users(users_full_name: list[str]) -> Annotated[list[User], "users"]:
+    users = []
+    metadata = {}
+    for user_full_name in users_full_name:
+        user = _get_or_create_user(user_full_name)
+        users.append(user)
+        metadata = _get_metadata(metadata, user_full_name, user)
+    step_context = get_step_context()
+    step_context.add_output_metadata(output_name="users", metadata=metadata)
+
+    return users
 
 
 def _get_or_create_user(user_full_name: str) -> Annotated[User, "user"]:
@@ -39,14 +54,11 @@ def _get_or_create_user(user_full_name: str) -> Annotated[User, "user"]:
     return user
 
 
-def _get_metadata(user_full_name: str, user: User) -> dict:
-    return {
-        "query": {
-            "user_full_name": user_full_name,
-        },
-        "retrieved": {
-            "user_id": str(user.id),
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-        },
+def _get_metadata(metadata: dict, user_full_name: str, user: User) -> dict:
+    metadata_copy = deepcopy(metadata)
+    metadata_copy[user_full_name] = {
+        "user_id": str(user.id),
+        "first_name": user.first_name,
+        "last_name": user.last_name,
     }
+    return metadata_copy

@@ -49,3 +49,13 @@ class MongoDB(BaseCRUD[T]):
         except errors.PyMongoError as err:
             raise err
         return result.deleted_count == 1
+
+    def find(self, filter: dict) -> list[T] | None:
+        result = []
+        try:
+            with self._collection.find(filter) as cursor:
+                for doc in cursor:
+                    result.append(self._to_model(doc))
+        except errors.PyMongoError as err:
+            raise err
+        return result

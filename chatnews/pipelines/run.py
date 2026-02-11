@@ -1,9 +1,23 @@
 import os
+from datetime import datetime
 
 import click
 from loguru import logger
+from zenml.client import Client
 
 from chatnews.pipelines.pipelines.extract_from_rss import extract_user_feeds
+from chatnews.pipelines.pipelines.features_store import features_store
+
+
+def get_last_run(client: Client, pipeline_name: str, step_name: str) -> datetime:
+    last_run = None
+    try:
+        last_pipeline_run = client.get_pipeline(pipeline_name).last_successful_run
+        last_step_run = last_pipeline_run.steps[step_name]
+        last_run = last_step_run.start_time
+    except (KeyError, RuntimeError):
+        pass
+    return last_run or datetime(2025, 1, 1)
 
 
 @click.command(
@@ -19,9 +33,17 @@ Examples:
 )
 @click.option(
     "--user-rss-config",
-    default="test.yaml",
+    is_flag=False,
+    flag_value="test.yaml",
     type=click.STRING,
     help="File config path.",
+)
+@click.option(
+    "--process-documents",
+    is_flag=False,
+    flag_value="test_process_documents.yaml",
+    type=click.STRING,
+    help="File config for processing documents.",
 )
 @click.option(
     "--no-cache",
@@ -30,7 +52,8 @@ Examples:
     help="Disable caching for the pipeline run.",
 )
 def main(
-    user_rss_config: str = "test.yaml",
+    user_rss_config: str,
+    process_documents: str,
     no_cache: bool = False,
 ):
     """Main entry point for the pipeline execution.
@@ -51,13 +74,29 @@ def main(
         os.path.dirname(os.path.realpath(__file__)),
         "configs",
     )
-    logger.info("Info run pipeline for file %s", user_rss_config)
     pipeline_args = {}
     if no_cache:
         pipeline_args["enable_cache"] = False
-    pipeline_args["config_path"] = os.path.join(config_folder, user_rss_config)
+
     run_args_feature = {}
-    extract_user_feeds.with_options(**pipeline_args)(**run_args_feature)
+
+    client = Client()
+
+    if user_rss_config:
+        logger.info("Info run pipeline for file %s", user_rss_config)
+        pipeline_args["config_path"] = os.path.join(config_folder, user_rss_config)
+        extract_user_feeds.with_options(**pipeline_args)(**run_args_feature)
+    if process_documents:
+        logger.info(f"\n{process_documents}")
+        logger.info("Info run pipeline for file %s", process_documents)
+        pipeline_args["config_path"] = os.path.join(config_folder, process_documents)
+        last_run = get_last_run(
+            client, pipeline_name="features_store", step_name="query_data_warehouse"
+        )
+        features_store.with_options(**pipeline_args)(
+            last_run=last_run, **run_args_feature
+        )
+
     logger.info("Feature Engineering pipeline finished successfully!\n")
 
 

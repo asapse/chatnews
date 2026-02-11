@@ -22,6 +22,10 @@ class BaseCRUD[T: BaseModel](ABC):
     def delete(self, id: str) -> bool:
         pass
 
+    @abstractmethod
+    def find(self, filter: dict) -> list[T] | None:
+        pass
+
     def _to_model(self, data: dict) -> T | None:
         if data is None:
             return None

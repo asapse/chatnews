@@ -25,6 +25,7 @@ DATABASE: MongoDB[Document] = MongoDB[Document](
 @step
 def fetch_links(user: User, links: list[str]) -> Annotated[list[str], "fetch_links"]:
     logger.info("Starting to crawl %d link(s).", {len(links)})
+    logger.info(f"User is {user}")
     metadata = {}
     successfull_crawls = 0
     for link in tqdm(links):
@@ -39,7 +40,7 @@ def fetch_links(user: User, links: list[str]) -> Annotated[list[str], "fetch_lin
             documents_insert,
             documents_not_insert,
         )
-
+    metadata["user_id"] = str(user.id)
     step_context = get_step_context()
     step_context.add_output_metadata(output_name="fetch_links", metadata=metadata)
 
