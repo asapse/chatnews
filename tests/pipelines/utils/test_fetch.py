@@ -94,3 +94,19 @@ def test_fetch(fetch: Fetch) -> None:
     documents = fetch.fetch()
     assert len(documents) > 0
     assert isinstance(documents[0], Document)
+
+
+def test_text_to_markdown_h1(fetch: Fetch) -> None:
+    assert fetch._text_to_markdown("Title 1", "h1") == "# Title 1"
+
+
+def test_text_to_markdown_h2(fetch: Fetch) -> None:
+    assert fetch._text_to_markdown("Title 2", "h2") == "## Title 2"
+
+
+def test_text_to_markdown_h3(fetch: Fetch) -> None:
+    assert fetch._text_to_markdown("Title 3", "h3") == "### Title 3"
+
+
+def test_text_to_markdown_paragraph(fetch: Fetch) -> None:
+    assert fetch._text_to_markdown("paragraph", "p") == "paragraph"

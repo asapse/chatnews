@@ -30,15 +30,28 @@ class Fetch:
     def _is_paywall(self, content: bytes) -> bool:
         return b"False" in self._paywall_pattern.findall(content)
 
+    def _text_to_markdown(self, text: str, element: str) -> str:
+        match element:
+            case "h1":
+                return f"# {text}"
+            case "h2":
+                return f"## {text}"
+            case "h3":
+                return f"### {text}"
+            case _:
+                return text
+
     def _get_body(self, content: bytes, language: str) -> str:
         paragraphs = justext(content, get_stoplist(language))
         body: str = ""
         body_full_page: str = ""
         for paragraph in paragraphs:
             if not paragraph.is_boilerplate:
+                dom_path = paragraph.dom_path
+                text = self._text_to_markdown(paragraph.text, dom_path.split(".")[-1])
                 if "article" in paragraph.dom_path:
-                    body += paragraph.text
-                body_full_page += paragraph.text
+                    body += text
+                body_full_page += text
         return body or body_full_page
 
     def _parse_document(self, document: dict, rss_feed: str) -> Document:
