@@ -1,0 +1,20 @@
+services:
+  mongo:
+    image: docker.io/mongodb/mongodb-community-server:latest
+    container_name: "chatnews"
+    logging:
+      options:
+        max-size: 1g
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - local
+
+volumes:
+  mongo_data:
+
+networks:
+  local:
+    driver: bridge
