@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from pydantic import (
     UUID4,
+    AliasChoices,
     BaseModel,
     Field,
     SerializerFunctionWrapHandler,
@@ -11,7 +12,9 @@ from pydantic import (
 
 
 class NoSQLDocument(BaseModel):
-    id: UUID4 = Field(default_factory=uuid4, alias="_id")
+    id: UUID4 = Field(
+        default_factory=uuid4, alias="_id", validation_alias=AliasChoices("id", "_id")
+    )
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, self.__class__):
